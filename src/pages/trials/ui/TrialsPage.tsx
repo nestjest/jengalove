@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { Direction, HeroStyle } from '../../../entities/game/model/types'
 import { useSwipeControls } from '../../../shared/lib/useSwipeControls'
 import { PixelButton } from '../../../shared/ui/PixelButton'
@@ -37,6 +38,27 @@ const maze = mazeRows.map((row) => row.split(''))
 
 const startPosition = { x: 0, y: 0 }
 
+const mazeCamera = {
+  viewWidth: 7,
+  viewHeight: 6,
+}
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value))
+
+const getCamera = (position: Position) => ({
+  x: clamp(
+    position.x - Math.floor(mazeCamera.viewWidth / 2),
+    0,
+    maze[0].length - mazeCamera.viewWidth,
+  ),
+  y: clamp(
+    position.y - Math.floor(mazeCamera.viewHeight / 2),
+    0,
+    maze.length - mazeCamera.viewHeight,
+  ),
+})
+
 const isWall = (position: Position) => maze[position.y]?.[position.x] === '#'
 
 const getNextPosition = (current: Position, direction: Direction) => {
@@ -70,6 +92,7 @@ export const TrialsPage = ({
 }: TrialsPageProps) => {
   const [player, setPlayer] = useState<Position>(startPosition)
   const [finished, setFinished] = useState(false)
+  const camera = getCamera(player)
 
   const move = (direction: Direction) => {
     if (finished) {
@@ -107,28 +130,40 @@ export const TrialsPage = ({
       </div>
 
       <div className="maze-stage game-stage" {...swipeHandlers}>
-        <div className="maze-grid">
-          {maze.map((row, y) =>
-            row.map((cell, x) => (
-              <div
-                className={`maze-cell maze-cell--${cell === '#' ? 'wall' : 'path'}`}
-                key={`${x}-${y}`}
-              >
-                {cell === 'D' ? <span className="maze-hazard">сомнения</span> : null}
-                {cell === 'Q' ? <span className="maze-hazard">ссора</span> : null}
-                {cell === 'G' ? <PixelSprite label="Женя" variant="zhenya" active /> : null}
-                {player.x === x && player.y === y ? (
-                  <PixelSprite
-                    active
-                    hair={heroStyle.hair}
-                    label="Игрок"
-                    outfit={heroStyle.outfit}
-                    variant="hero"
-                  />
-                ) : null}
-              </div>
-            )),
-          )}
+        <div
+          className="maze-map"
+          style={
+            {
+              '--maze-cols': maze[0].length,
+              '--maze-rows': maze.length,
+              '--maze-camera-x': camera.x,
+              '--maze-camera-y': camera.y,
+            } as CSSProperties
+          }
+        >
+          <div className="maze-grid">
+            {maze.map((row, y) =>
+              row.map((cell, x) => (
+                <div
+                  className={`maze-cell maze-cell--${cell === '#' ? 'wall' : 'path'}`}
+                  key={`${x}-${y}`}
+                >
+                  {cell === 'D' ? <span className="maze-hazard">сомнения</span> : null}
+                  {cell === 'Q' ? <span className="maze-hazard">ссора</span> : null}
+                  {cell === 'G' ? <PixelSprite label="Женя" variant="zhenya" active /> : null}
+                  {player.x === x && player.y === y ? (
+                    <PixelSprite
+                      active
+                      hair={heroStyle.hair}
+                      label="Игрок"
+                      outfit={heroStyle.outfit}
+                      variant="hero"
+                    />
+                  ) : null}
+                </div>
+              )),
+            )}
+          </div>
         </div>
       </div>
 

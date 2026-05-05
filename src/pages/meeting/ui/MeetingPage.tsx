@@ -23,15 +23,15 @@ type MeetingPageProps = {
 const world = {
   width: 34,
   height: 24,
-  viewWidth: 10,
-  viewHeight: 7,
+  viewWidth: 6,
+  viewHeight: 6,
 }
 
 const coffeeRoom = {
   width: 10,
   height: 7,
-  viewWidth: 10,
-  viewHeight: 7,
+  viewWidth: 6,
+  viewHeight: 5,
 }
 
 const startPosition = { x: 3, y: 18 }
@@ -208,9 +208,15 @@ const getCoffeeTerrain = (position: Position) => {
   return 'floor'
 }
 
-const getCamera = (position: Position, width: number, height: number) => ({
-  x: clamp(position.x - Math.floor(world.viewWidth / 2), 0, width - world.viewWidth),
-  y: clamp(position.y - Math.floor(world.viewHeight / 2), 0, height - world.viewHeight),
+const getCamera = (
+  position: Position,
+  width: number,
+  height: number,
+  viewWidth: number,
+  viewHeight: number,
+) => ({
+  x: clamp(position.x - Math.floor(viewWidth / 2), 0, width - viewWidth),
+  y: clamp(position.y - Math.floor(viewHeight / 2), 0, height - viewHeight),
 })
 
 const renderTiles = (
@@ -251,8 +257,14 @@ export const MeetingPage = ({
   const allItemsFound = foundCount === meetingItems.length
   const camera =
     mode === 'world'
-      ? getCamera(player, world.width, world.height)
-      : { x: 0, y: 0 }
+      ? getCamera(player, world.width, world.height, world.viewWidth, world.viewHeight)
+      : getCamera(
+          coffeePlayer,
+          coffeeRoom.width,
+          coffeeRoom.height,
+          coffeeRoom.viewWidth,
+          coffeeRoom.viewHeight,
+        )
 
   useEffect(() => {
     if (!finalPhraseVisible || completedRef.current) {

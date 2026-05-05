@@ -1324,22 +1324,35 @@ body {
 }
 
 .maze-stage {
+  --maze-tile-size: clamp(46px, 11vw, 62px);
   display: grid;
   place-items: center;
-  padding: 10px 10px 118px;
+  padding: 0;
   background:
     radial-gradient(circle at 50% 50%, rgba(89, 216, 255, 0.13), transparent 36%),
     #101016;
 }
 
+.maze-map {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--maze-cols) * var(--maze-tile-size));
+  height: calc(var(--maze-rows) * var(--maze-tile-size));
+  transform: translate(
+    calc(var(--maze-camera-x) * var(--maze-tile-size) * -1),
+    calc(var(--maze-camera-y) * var(--maze-tile-size) * -1)
+  );
+  transition: transform 180ms steps(4, end);
+}
+
 .maze-grid {
   display: grid;
-  grid-template-columns: repeat(16, minmax(28px, 1fr));
-  grid-template-rows: repeat(13, minmax(28px, 1fr));
-  gap: 4px;
-  width: min(100%, 980px);
-  max-height: 100%;
-  aspect-ratio: 16 / 13;
+  grid-template-columns: repeat(var(--maze-cols), var(--maze-tile-size));
+  grid-template-rows: repeat(var(--maze-rows), var(--maze-tile-size));
+  gap: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .maze-cell {
@@ -1352,6 +1365,7 @@ body {
 
 .maze-cell .pixel-sprite {
   z-index: 5;
+  transform: scale(0.74);
 }
 
 .maze-cell--wall {
@@ -1379,7 +1393,7 @@ body {
   color: var(--text);
   background: var(--danger);
   font-family: var(--pixel-font);
-  font-size: clamp(5px, 1vw, 8px);
+  font-size: clamp(4px, 1vw, 7px);
   line-height: 1.4;
   text-align: center;
   animation: flicker 0.8s steps(2, end) infinite;
@@ -2407,17 +2421,20 @@ body {
   }
 
   .maze-stage {
-    padding: 8px 8px 104px;
+    --maze-tile-size: 48px;
+    padding: 0;
   }
 
   .maze-grid {
-    gap: 2px;
-    grid-template-columns: repeat(16, minmax(18px, 1fr));
-    grid-template-rows: repeat(13, minmax(18px, 1fr));
+    gap: 0;
   }
 
   .maze-hazard {
     font-size: 4px;
+  }
+
+  .maze-cell .pixel-sprite {
+    transform: scale(0.7);
   }
 
   .cutscene-page {
