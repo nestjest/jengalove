@@ -96,7 +96,7 @@ export const MomentsPage = ({
   }
 
   return (
-    <section className="level-page page-fade">
+    <section className="level-page moments-page page-fade">
       <div className="level-heading">
         <p>Уровень 2</p>
         <h1>Наши моменты</h1>
