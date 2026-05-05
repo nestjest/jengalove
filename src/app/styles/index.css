@@ -264,7 +264,10 @@ body {
   position: relative;
   z-index: 1;
   display: grid;
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
   padding: 92px 18px 28px;
 }
 
@@ -320,8 +323,9 @@ body {
 
 .level-page {
   position: relative;
+  grid-template-rows: auto minmax(0, 1fr);
   align-content: start;
-  gap: 22px;
+  gap: 14px;
 }
 
 .level-heading {
@@ -352,7 +356,8 @@ body {
 .game-stage {
   position: relative;
   width: min(1180px, 100%);
-  min-height: min(72svh, 720px);
+  height: 100%;
+  min-height: 0;
   margin: 0 auto;
   overflow: hidden;
   border: 4px solid var(--text);
@@ -371,7 +376,7 @@ body {
 }
 
 .meeting-page {
-  padding-top: 72px;
+  padding-top: 56px;
 }
 
 .meeting-page .level-heading {
@@ -380,8 +385,8 @@ body {
 
 .meeting-page .game-stage {
   width: min(1480px, 100%);
-  height: min(66svh, 640px);
-  min-height: 460px;
+  height: 100%;
+  min-height: 0;
 }
 
 .meeting-page .level-panel {
@@ -391,21 +396,19 @@ body {
   left: max(14px, env(safe-area-inset-left));
   z-index: 10;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(108px, auto) minmax(0, 1fr) auto;
   grid-template-areas:
-    "hint hint"
-    "action pad";
-  align-items: end;
+    "hint hint hint"
+    "action spacer pad";
+  align-items: center;
   justify-content: stretch;
   gap: 8px 12px;
   width: auto;
   max-width: none;
-  max-height: 30svh;
-  padding: 8px 10px;
-  border: 3px solid rgba(255, 255, 255, 0.72);
-  background: rgba(15, 15, 15, 0.56);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(2px);
+  padding: 9px 10px;
+  border: 3px solid #ffffff;
+  background: rgba(15, 15, 15, 0.9);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.68);
 }
 
 .trials-page .level-panel {
@@ -415,21 +418,19 @@ body {
   left: max(14px, env(safe-area-inset-left));
   z-index: 10;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(108px, auto) minmax(0, 1fr) auto;
   grid-template-areas:
     "note note"
     "action pad";
-  align-items: end;
+  align-items: center;
   justify-content: stretch;
   gap: 8px 12px;
   width: auto;
   max-width: none;
-  max-height: 32svh;
-  padding: 8px 10px;
-  border: 3px solid rgba(255, 255, 255, 0.72);
-  background: rgba(15, 15, 15, 0.56);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(2px);
+  padding: 9px 10px;
+  border: 3px solid #ffffff;
+  background: rgba(15, 15, 15, 0.9);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.68);
 }
 
 .meeting-stage {
@@ -527,7 +528,8 @@ body {
 }
 
 .meeting-map .sprite-cell {
-  z-index: 8;
+  z-index: 12;
+  pointer-events: none;
 }
 
 .meeting-map .sprite-cell .pixel-sprite {
@@ -1094,7 +1096,9 @@ body {
   align-self: center;
   justify-self: start;
   min-height: 44px;
-  max-width: min(210px, 42vw);
+  max-width: min(220px, 44vw);
+  color: #111111;
+  background: var(--accent-2);
   white-space: normal;
 }
 
@@ -1109,9 +1113,9 @@ body {
 
 .meeting-page .pixel-button,
 .trials-page .pixel-button {
-  border-color: rgba(255, 255, 255, 0.82);
-  background: rgba(34, 34, 34, 0.62);
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.42);
+  border-color: #ffffff;
+  background: rgba(17, 17, 17, 0.96);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.76);
 }
 
 .meeting-page .pixel-button:hover:not(:disabled),
@@ -2212,7 +2216,7 @@ body {
   }
 
   .game-stage {
-    min-height: 66svh;
+    min-height: 0;
   }
 
   .scene-item {
@@ -2304,6 +2308,7 @@ body {
     bottom: 8px;
     left: 8px;
     gap: 6px 8px;
+    grid-template-columns: minmax(96px, auto) minmax(0, 1fr) auto;
     padding: 7px;
   }
 
