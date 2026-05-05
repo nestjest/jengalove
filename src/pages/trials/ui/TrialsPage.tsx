@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import type { Direction } from '../../../entities/game/model/types'
+import type { Direction, HeroStyle } from '../../../entities/game/model/types'
 import { useSwipeControls } from '../../../shared/lib/useSwipeControls'
 import { PixelButton } from '../../../shared/ui/PixelButton'
 import { PixelSprite } from '../../../shared/ui/PixelSprite'
 
 type TrialsPageProps = {
+  heroStyle: HeroStyle
   onLoveChange: (delta: number) => void
   onComplete: () => void
   onShake: () => void
@@ -61,6 +62,7 @@ const getNextPosition = (current: Position, direction: Direction) => {
 }
 
 export const TrialsPage = ({
+  heroStyle,
   onLoveChange,
   onComplete,
   onShake,
@@ -98,7 +100,7 @@ export const TrialsPage = ({
   const swipeHandlers = useSwipeControls((direction) => move(direction))
 
   return (
-    <section className="level-page page-fade">
+    <section className="level-page trials-page page-fade">
       <div className="level-heading">
         <p>Уровень 3</p>
         <h1>Испытания</h1>
@@ -116,7 +118,13 @@ export const TrialsPage = ({
                 {cell === 'Q' ? <span className="maze-hazard">ссора</span> : null}
                 {cell === 'G' ? <PixelSprite label="Женя" variant="zhenya" active /> : null}
                 {player.x === x && player.y === y ? (
-                  <PixelSprite label="Игрок" variant="hero" active />
+                  <PixelSprite
+                    active
+                    hair={heroStyle.hair}
+                    label="Игрок"
+                    outfit={heroStyle.outfit}
+                    variant="hero"
+                  />
                 ) : null}
               </div>
             )),

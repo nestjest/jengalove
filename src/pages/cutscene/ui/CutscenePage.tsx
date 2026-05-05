@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { MouseEvent } from 'react'
+import type { Direction, HeroStyle } from '../../../entities/game/model/types'
 import { useSwipeControls } from '../../../shared/lib/useSwipeControls'
 import { PixelButton } from '../../../shared/ui/PixelButton'
 import { PixelSprite } from '../../../shared/ui/PixelSprite'
-import type { Direction } from '../../../entities/game/model/types'
 
 type CutsceneVariant =
   | 'intro'
@@ -12,13 +13,17 @@ type CutsceneVariant =
   | 'climax'
 
 type CutscenePageProps = {
+  heroStyle: HeroStyle
   variant: CutsceneVariant
   onComplete: () => void
+  onHeroStyleChange: (heroStyle: HeroStyle) => void
   onSound: (name: 'click' | 'pickup' | 'success') => void
 }
 
+type Speaker = 'Текст' | 'Женя' | 'Я'
+
 type DialogueLine = {
-  speaker: 'Текст' | 'Женя' | 'Я'
+  speaker: Speaker
   text: string
 }
 
@@ -30,22 +35,19 @@ type Shot = {
   interactive?: 'style'
 }
 
-const line = (speaker: DialogueLine['speaker'], text: string): DialogueLine => ({
-  speaker,
-  text,
-})
+const line = (speaker: Speaker, text: string): DialogueLine => ({ speaker, text })
 
 const shotsByVariant: Record<CutsceneVariant, Shot[]> = {
   intro: [
     {
       title: 'Пробуждение',
-      lines: [line('Текст', 'Обычное утро...')],
+      lines: [line('Я', 'Обычное утро...')],
       scene: 'room',
     },
     {
       title: 'Телефон',
       lines: [
-        line('Текст', '...но что-то изменилось'),
+        line('Я', '...но что-то изменилось'),
         line('Женя', 'Доброе утро :)'),
         line('Женя', 'Как ты?'),
       ],
@@ -79,10 +81,7 @@ const shotsByVariant: Record<CutsceneVariant, Shot[]> = {
   firstMeeting: [
     {
       title: 'Первая встреча',
-      lines: [
-        line('Текст', 'Женя стояла спиной'),
-        line('Текст', 'Я подошел ближе'),
-      ],
+      lines: [line('Текст', 'Женя стояла спиной'), line('Я', 'Я подошел ближе')],
       scene: 'meeting',
     },
     {
@@ -90,7 +89,7 @@ const shotsByVariant: Record<CutsceneVariant, Shot[]> = {
       lines: [
         line('Женя', 'Привет...'),
         line('Я', 'Привет'),
-        line('Текст', 'И все стало... другим'),
+        line('Я', 'И все стало... другим'),
       ],
       scene: 'meeting',
     },
@@ -109,8 +108,8 @@ const shotsByVariant: Record<CutsceneVariant, Shot[]> = {
     {
       title: 'Мгновения',
       lines: [
-        line('Текст', 'Каждый момент...'),
-        line('Текст', 'становился важнее предыдущего'),
+        line('Я', 'Каждый момент...'),
+        line('Я', 'становился важнее предыдущего'),
       ],
       scene: 'montage',
     },
@@ -119,7 +118,7 @@ const shotsByVariant: Record<CutsceneVariant, Shot[]> = {
     {
       title: 'Осознание',
       lines: [
-        line('Текст', 'И тогда я понял...'),
+        line('Я', 'И тогда я понял...'),
         line('Я', 'мне мало просто встреч'),
         line('Я', 'я хочу видеть ее всегда'),
       ],
@@ -151,27 +150,54 @@ const hairOptions = [
   { label: 'смело', hair: 'bold' as const },
 ]
 
-export const CutscenePage = ({ variant, onComplete, onSound }: CutscenePageProps) => {
+export const CutscenePage = ({
+  heroStyle,
+  variant,
+  onComplete,
+  onHeroStyleChange,
+  onSound,
+}: CutscenePageProps) => {
   const shots = shotsByVariant[variant]
   const [shotIndex, setShotIndex] = useState(0)
   const [lineIndex, setLineIndex] = useState(0)
   const [selectedReply, setSelectedReply] = useState('')
-  const [styleIndex, setStyleIndex] = useState(0)
-  const [hairIndex, setHairIndex] = useState(0)
+  const [styleIndex, setStyleIndex] = useState(() =>
+    Math.max(0, styleOptions.findIndex((option) => option.outfit === heroStyle.outfit)),
+  )
+  const [hairIndex, setHairIndex] = useState(() =>
+    Math.max(0, hairOptions.findIndex((option) => option.hair === heroStyle.hair)),
+  )
   const shot = shots[shotIndex]
-  const visibleLines = shot.lines.slice(0, lineIndex + 1)
+  const visibleLines = [shot.lines[lineIndex]]
   const choicesVisible = Boolean(shot.choices && lineIndex >= shot.lines.length - 1)
   const canContinue = !shot.choices || selectedReply.length > 0
-
-  useEffect(() => {
-    setLineIndex(0)
-    setSelectedReply('')
-  }, [shotIndex])
+  const heroOutfit = styleOptions[styleIndex].outfit
+  const heroHair = hairOptions[hairIndex].hair
 
   const sceneClassName = useMemo(
     () => `cutscene-frame cutscene-frame--${shot.scene}`,
     [shot.scene],
   )
+
+  const goToNextShot = () => {
+    if (shot.interactive === 'style') {
+      onHeroStyleChange({
+        hair: heroHair,
+        outfit: heroOutfit,
+      })
+    }
+
+    onSound(shotIndex === shots.length - 1 ? 'success' : 'click')
+
+    if (shotIndex === shots.length - 1) {
+      onComplete()
+      return
+    }
+
+    setLineIndex(0)
+    setSelectedReply('')
+    setShotIndex((current) => current + 1)
+  }
 
   const next = () => {
     if (lineIndex < shot.lines.length - 1) {
@@ -185,14 +211,7 @@ export const CutscenePage = ({ variant, onComplete, onSound }: CutscenePageProps
       return
     }
 
-    onSound(shotIndex === shots.length - 1 ? 'success' : 'click')
-
-    if (shotIndex === shots.length - 1) {
-      onComplete()
-      return
-    }
-
-    setShotIndex((current) => current + 1)
+    goToNextShot()
   }
 
   const changeStyle = (direction: Direction) => {
@@ -201,27 +220,62 @@ export const CutscenePage = ({ variant, onComplete, onSound }: CutscenePageProps
     }
 
     if (direction === 'left' || direction === 'right') {
-      setStyleIndex((current) =>
-        direction === 'right'
+      setStyleIndex((current) => {
+        const nextIndex = direction === 'right'
           ? (current + 1) % styleOptions.length
-          : (current + styleOptions.length - 1) % styleOptions.length,
-      )
+          : (current + styleOptions.length - 1) % styleOptions.length
+
+        onHeroStyleChange({
+          hair: hairOptions[hairIndex].hair,
+          outfit: styleOptions[nextIndex].outfit,
+        })
+
+        return nextIndex
+      })
     }
 
     if (direction === 'up' || direction === 'down') {
-      setHairIndex((current) =>
-        direction === 'down'
+      setHairIndex((current) => {
+        const nextIndex = direction === 'down'
           ? (current + 1) % hairOptions.length
-          : (current + hairOptions.length - 1) % hairOptions.length,
-      )
+          : (current + hairOptions.length - 1) % hairOptions.length
+
+        onHeroStyleChange({
+          hair: hairOptions[nextIndex].hair,
+          outfit: styleOptions[styleIndex].outfit,
+        })
+
+        return nextIndex
+      })
     }
 
     onSound('click')
   }
 
   const swipeHandlers = useSwipeControls(changeStyle)
-  const heroOutfit = styleOptions[styleIndex].outfit
-  const heroHair = hairOptions[hairIndex].hair
+
+  const handleFrameClick = (event: MouseEvent<HTMLElement>) => {
+    if (shot.interactive === 'style') {
+      return
+    }
+
+    if ((event.target as HTMLElement).closest('button')) {
+      return
+    }
+
+    next()
+  }
+
+  const chooseReply = (choice: string) => {
+    setSelectedReply(choice)
+    onSound('click')
+
+    window.setTimeout(() => {
+      setLineIndex(0)
+      setSelectedReply('')
+      setShotIndex((current) => Math.min(current + 1, shots.length - 1))
+    }, 260)
+  }
 
   return (
     <section className="cutscene-page page-fade">
@@ -230,7 +284,7 @@ export const CutscenePage = ({ variant, onComplete, onSound }: CutscenePageProps
         <h1>{shot.title}</h1>
       </div>
 
-      <div className={sceneClassName} {...swipeHandlers}>
+      <div className={sceneClassName} {...swipeHandlers} onClick={handleFrameClick}>
         {shot.scene === 'room' ? (
           <div className="pixel-room">
             <div className="room-bed">
@@ -247,28 +301,41 @@ export const CutscenePage = ({ variant, onComplete, onSound }: CutscenePageProps
 
         {shot.scene === 'phone' ? (
           <div className="phone-ui">
-            <div className="phone-header">Женя ❤️</div>
-            <div className="phone-message"><strong>Женя:</strong> Доброе утро :)</div>
-            <div className="phone-message"><strong>Женя:</strong> Как ты?</div>
-            {selectedReply ? <div className="phone-message is-player"><strong>Я:</strong> {selectedReply}</div> : null}
-            {selectedReply ? <div className="phone-message"><strong>Женя:</strong> Хаха :) Давай увидимся?</div> : null}
+            <div className="phone-notch" />
+            <div className="phone-status">09:17</div>
+            <div className="phone-header">Женя</div>
+            <div className="phone-notifications" aria-label="Уведомления от Жени">
+              <div className="phone-notification phone-notification--one">
+                <strong>Женя</strong>
+                <span>Доброе утро :)</span>
+              </div>
+              <div className="phone-notification phone-notification--two">
+                <strong>Женя</strong>
+                <span>Как ты?</span>
+              </div>
+            </div>
           </div>
         ) : null}
 
         {shot.scene === 'mirror' ? (
           <div className="mirror-scene">
             <div className="mirror-panel">
-              <PixelSprite
-                active
-                hair={heroHair}
-                label="Герой у зеркала"
-                outfit={heroOutfit}
-                variant="hero"
-              />
+              <PixelSprite active hair={heroHair} label="Герой у зеркала" outfit={heroOutfit} variant="hero" />
+              <p className="mirror-goal">Выбери образ перед встречей с Женей</p>
             </div>
             <div className="style-panel">
               <span>одежда: {styleOptions[styleIndex].label}</span>
               <span>прическа: {hairOptions[hairIndex].label}</span>
+              <p>Свайп влево/вправо меняет одежду</p>
+              <p>Свайп вверх/вниз меняет прическу</p>
+              <PixelButton
+                onClick={goToNextShot}
+                onPointerDown={(event) => {
+                  event.stopPropagation()
+                }}
+              >
+                ПРОДОЛЖИТЬ
+              </PixelButton>
             </div>
           </div>
         ) : null}
@@ -279,42 +346,52 @@ export const CutscenePage = ({ variant, onComplete, onSound }: CutscenePageProps
         {shot.scene === 'dark' ? <div className="lonely-scene"><PixelSprite hair={heroHair} label="Герой" outfit={heroOutfit} variant="hero" /><div className="silent-phone" /></div> : null}
         {shot.scene === 'stars' ? <div className="stars-scene"><PixelSprite active hair={heroHair} label="Герой" outfit={heroOutfit} variant="hero" /><PixelSprite active label="Женя" variant="zhenya" /></div> : null}
 
-        <div className="cutscene-text">
-          {visibleLines.map((item, index) => (
-            <div className="dialogue-line" key={`${item.speaker}-${item.text}-${index}`}>
-              <strong>{item.speaker}</strong>
-              <p className="typewriter-line">{item.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+        {shot.interactive !== 'style' ? (
+          <div
+            className="cutscene-text"
+            onClick={(event) => {
+              event.stopPropagation()
+              next()
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                next()
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            {visibleLines.map((item, index) => (
+              <div className="dialogue-line" key={`${item.speaker}-${item.text}-${index}`}>
+                <strong>{item.speaker}</strong>
+                <p className="typewriter-line">{item.text}</p>
+              </div>
+            ))}
 
-      {shot.choices && choicesVisible ? (
-        <div className="choice-row">
-          {shot.choices.map((choice) => (
-            <PixelButton
-              key={choice}
-              onClick={() => {
-                setSelectedReply(choice)
-                onSound('click')
-              }}
-              variant={selectedReply === choice ? 'primary' : 'ghost'}
-            >
-              {choice}
-            </PixelButton>
-          ))}
-        </div>
-      ) : null}
+            {shot.choices && choicesVisible ? (
+              <div className="choice-row choice-row--inside">
+                {shot.choices.map((choice) => (
+                  <PixelButton
+                    key={choice}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      chooseReply(choice)
+                    }}
+                    onPointerDown={(event) => {
+                      event.stopPropagation()
+                    }}
+                    variant={selectedReply === choice ? 'primary' : 'ghost'}
+                  >
+                    {choice}
+                  </PixelButton>
+                ))}
+              </div>
+            ) : null}
 
-      <div className="level-panel">
-        {shot.interactive === 'style' ? (
-          <p className="meeting-help">Свайп: влево/вправо одежда, вверх/вниз прическа</p>
+            <span className="dialogue-next-arrow" aria-hidden="true">▼</span>
+          </div>
         ) : null}
-        <PixelButton disabled={!canContinue} onClick={next}>
-          {shotIndex === shots.length - 1 && lineIndex === shot.lines.length - 1
-            ? 'ДАЛЬШЕ'
-            : 'ПРОДОЛЖИТЬ'}
-        </PixelButton>
       </div>
     </section>
   )

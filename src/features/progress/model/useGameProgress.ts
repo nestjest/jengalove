@@ -3,6 +3,7 @@ import { defaultProgress } from '../../../entities/game/model/progress'
 import { nextSceneByLevel } from '../../../entities/game/model/content'
 import type {
   GameProgress,
+  HeroStyle,
   LevelKey,
   SceneKey,
 } from '../../../entities/game/model/types'
@@ -77,6 +78,13 @@ export const useGameProgress = () => {
     }))
   }
 
+  const updateHeroStyle = (heroStyle: HeroStyle) => {
+    updateProgress((current) => ({
+      ...current,
+      heroStyle,
+    }))
+  }
+
   const solveConfession = () => {
     updateProgress((current) => ({ ...current, confessionSolved: true }))
   }
@@ -98,6 +106,7 @@ export const useGameProgress = () => {
     collectMeetingItem,
     matchMemoryPair,
     collectWord,
+    updateHeroStyle,
     solveConfession,
     openFinalVideo,
     resetProgress,

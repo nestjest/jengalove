@@ -8,6 +8,10 @@ export const defaultProgress: GameProgress = {
   foundMeetingItems: [],
   matchedMemoryPairs: [],
   collectedWords: [],
+  heroStyle: {
+    hair: 'default',
+    outfit: 'jacket',
+  },
   confessionSolved: false,
   finalOpened: false,
 }

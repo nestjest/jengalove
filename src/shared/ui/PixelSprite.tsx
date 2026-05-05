@@ -1,9 +1,11 @@
+import type { HeroHair, HeroOutfit } from '../../entities/game/model/types'
+
 type PixelSpriteProps = {
   variant: 'hero' | 'zhenya'
   active?: boolean
   label: string
-  hair?: 'default' | 'neat' | 'bold'
-  outfit?: 'jacket' | 'shirt' | 'sweater'
+  hair?: HeroHair
+  outfit?: HeroOutfit
 }
 
 export const PixelSprite = ({

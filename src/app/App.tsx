@@ -45,6 +45,8 @@ export const App = () => {
       {scene === 'introCutscene' ? (
         <CutscenePage
           onComplete={() => game.goToScene('meeting')}
+          heroStyle={game.progress.heroStyle}
+          onHeroStyleChange={game.updateHeroStyle}
           onSound={sound.play}
           variant="intro"
         />
@@ -62,6 +64,8 @@ export const App = () => {
       {scene === 'firstMeetingCutscene' ? (
         <CutscenePage
           onComplete={() => game.goToScene('moments')}
+          heroStyle={game.progress.heroStyle}
+          onHeroStyleChange={game.updateHeroStyle}
           onSound={sound.play}
           variant="firstMeeting"
         />
@@ -79,6 +83,8 @@ export const App = () => {
       {scene === 'momentsCutscene' ? (
         <CutscenePage
           onComplete={() => game.goToScene('trials')}
+          heroStyle={game.progress.heroStyle}
+          onHeroStyleChange={game.updateHeroStyle}
           onSound={sound.play}
           variant="moments"
         />
@@ -86,6 +92,7 @@ export const App = () => {
 
       {scene === 'trials' ? (
         <TrialsPage
+          heroStyle={game.progress.heroStyle}
           onComplete={() => game.completeLevel('trials')}
           onLoveChange={game.changeLove}
           onShake={triggerShake}
@@ -96,6 +103,8 @@ export const App = () => {
       {scene === 'realizationCutscene' ? (
         <CutscenePage
           onComplete={() => game.goToScene('why')}
+          heroStyle={game.progress.heroStyle}
+          onHeroStyleChange={game.updateHeroStyle}
           onSound={sound.play}
           variant="realization"
         />
@@ -122,6 +131,8 @@ export const App = () => {
       {scene === 'climaxCutscene' ? (
         <CutscenePage
           onComplete={() => game.goToScene('final')}
+          heroStyle={game.progress.heroStyle}
+          onHeroStyleChange={game.updateHeroStyle}
           onSound={sound.play}
           variant="climax"
         />

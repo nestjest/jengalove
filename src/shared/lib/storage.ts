@@ -1,5 +1,5 @@
 import { defaultProgress } from '../../entities/game/model/progress'
-import type { GameProgress } from '../../entities/game/model/types'
+import type { GameProgress, HeroStyle } from '../../entities/game/model/types'
 
 const STORAGE_KEY = 'jenga-love-progress'
 
@@ -13,6 +13,11 @@ const stringArray = (value: unknown, fallback: string[]) =>
 
 const migrateMeetingItems = (items: string[]) =>
   Array.from(new Set(items.map((item) => (item === 'rain' ? 'bench' : item))))
+
+const isHeroStyle = (value: unknown): value is HeroStyle =>
+  isRecord(value) &&
+  (value.hair === 'default' || value.hair === 'neat' || value.hair === 'bold') &&
+  (value.outfit === 'jacket' || value.outfit === 'shirt' || value.outfit === 'sweater')
 
 export const loadProgress = (): GameProgress => {
   try {
@@ -51,6 +56,9 @@ export const loadProgress = (): GameProgress => {
         parsed.collectedWords,
         defaultProgress.collectedWords,
       ),
+      heroStyle: isHeroStyle(parsed.heroStyle)
+        ? parsed.heroStyle
+        : defaultProgress.heroStyle,
       confessionSolved:
         typeof parsed.confessionSolved === 'boolean'
           ? parsed.confessionSolved

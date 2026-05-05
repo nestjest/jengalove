@@ -205,7 +205,13 @@ export const ConfessionPage = ({
 
         {solved ? (
           <button className="zhenya-arrival pixel-dissolve" type="button" {...holdHandlers}>
-            <PixelSprite label="Женя" variant="zhenya" active />
+            <PixelSprite
+              active
+              hair={progress.heroStyle.hair}
+              label="Я"
+              outfit={progress.heroStyle.outfit}
+              variant="hero"
+            />
             <span>Я люблю тебя</span>
           </button>
         ) : null}

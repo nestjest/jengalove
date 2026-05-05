@@ -80,6 +80,21 @@ const decorations = [
   { kind: 'lamp', x: 22, y: 11 },
   { kind: 'stone', x: 21, y: 15 },
   { kind: 'stone', x: 29, y: 15 },
+  { kind: 'bush', x: 3, y: 17 },
+  { kind: 'bush', x: 5, y: 20 },
+  { kind: 'bush', x: 9, y: 18 },
+  { kind: 'bush', x: 14, y: 12 },
+  { kind: 'bush', x: 17, y: 15 },
+  { kind: 'bush', x: 25, y: 10 },
+  { kind: 'bush', x: 27, y: 14 },
+  { kind: 'bush', x: 32, y: 14 },
+  { kind: 'flower', x: 4, y: 19 },
+  { kind: 'flower-alt', x: 8, y: 17 },
+  { kind: 'flower', x: 13, y: 15 },
+  { kind: 'flower-alt', x: 16, y: 20 },
+  { kind: 'flower', x: 21, y: 13 },
+  { kind: 'flower-alt', x: 26, y: 15 },
+  { kind: 'flower', x: 30, y: 13 },
 ]
 
 const interactiveSpots = [
@@ -466,7 +481,13 @@ export const MeetingPage = ({
                 className="sprite-cell"
                 style={{ '--cell-x': player.x, '--cell-y': player.y } as CSSProperties}
               >
-                <PixelSprite label="Игрок" variant="hero" active />
+                <PixelSprite
+                  active
+                  hair={progress.heroStyle.hair}
+                  label="Игрок"
+                  outfit={progress.heroStyle.outfit}
+                  variant="hero"
+                />
               </div>
             </>
           ) : (
@@ -481,6 +502,36 @@ export const MeetingPage = ({
                 className="map-counter"
                 style={{ '--cell-x': 3, '--cell-y': 1 } as CSSProperties}
               />
+              {[
+                { x: 2, y: 3 },
+                { x: 7, y: 3 },
+                { x: 2, y: 5 },
+                { x: 7, y: 5 },
+              ].map((table) => (
+                <div
+                  className="cafe-table"
+                  key={`${table.x}-${table.y}`}
+                  style={{ '--cell-x': table.x, '--cell-y': table.y } as CSSProperties}
+                />
+              ))}
+              {[
+                { x: 2, y: 2 },
+                { x: 7, y: 4 },
+              ].map((guest) => (
+                <div
+                  className="cafe-guest"
+                  key={`${guest.x}-${guest.y}`}
+                  style={{ '--cell-x': guest.x, '--cell-y': guest.y } as CSSProperties}
+                >
+                  <PixelSprite label="Посетитель" variant="hero" />
+                </div>
+              ))}
+              <div
+                className="barista-sprite"
+                style={{ '--cell-x': 4, '--cell-y': 2 } as CSSProperties}
+              >
+                <PixelSprite label="Бариста" outfit="shirt" variant="hero" />
+              </div>
               <div
                 className="map-label"
                 style={{ '--cell-x': coffeeExit.x, '--cell-y': coffeeExit.y } as CSSProperties}
@@ -491,7 +542,13 @@ export const MeetingPage = ({
                 className="sprite-cell"
                 style={{ '--cell-x': coffeePlayer.x, '--cell-y': coffeePlayer.y } as CSSProperties}
               >
-                <PixelSprite label="Игрок" variant="hero" active />
+                <PixelSprite
+                  active
+                  hair={progress.heroStyle.hair}
+                  label="Игрок"
+                  outfit={progress.heroStyle.outfit}
+                  variant="hero"
+                />
               </div>
             </>
           )}
