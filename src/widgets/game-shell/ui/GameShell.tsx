@@ -17,7 +17,7 @@ export const GameShell = ({
   onReset,
   shaking = false,
 }: GameShellProps) => (
-  <main className={`game-shell ${shaking ? 'is-shaking' : ''}`}>
+  <main className={`game-shell ${scene === 'start' ? 'is-start-scene' : ''} ${shaking ? 'is-shaking' : ''}`}>
     <div className="scanline" aria-hidden="true" />
     <div className="pixel-particles" aria-hidden="true">
       <span />
